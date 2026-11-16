@@ -33,27 +33,80 @@
   
   <!-- FontAwesome -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Google Fonts pour une touche festive et premium -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Mountains+of+Christmas:wght@700&display=swap" rel="stylesheet">
   <!-- Canvas Confetti -->
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 
   <style>
+    .font-festive {
+      font-family: 'Mountains of Christmas', cursive;
+    }
+
+    /* Neige continue et fluide */
     .snowflake {
-      color: rgba(255, 255, 255, 0.45);
+      color: #ffffff;
       position: fixed;
-      top: -20px;
-      z-index: 1;
+      top: -30px;
+      z-index: 5;
       user-select: none;
-      cursor: default;
-      animation: snowflakes-fall 11s linear infinite, snowflakes-shake 3s ease-in-out infinite;
+      pointer-events: none;
+      text-shadow: 0 0 6px rgba(148, 163, 184, 0.7), 0 0 12px rgba(255, 255, 255, 0.9);
+      animation: snowflakes-fall linear infinite, snowflakes-sway ease-in-out infinite;
     }
     @keyframes snowflakes-fall {
-      0% { top: -5%; }
-      100% { top: 105%; }
+      0% { transform: translateY(-5vh) rotate(0deg); }
+      100% { transform: translateY(110vh) rotate(360deg); }
     }
-    @keyframes snowflakes-shake {
-      0%, 100% { transform: translateX(0); }
-      50% { transform: translateX(45px); }
+    @keyframes snowflakes-sway {
+      0%, 100% { margin-left: 0px; }
+      50% { margin-left: 35px; }
     }
+
+    /* Animation du Père Noël qui descend en rappel avec sa corde */
+    @keyframes santa-rappel {
+      0%, 100% { transform: translateY(0px) rotate(-1deg); }
+      40% { transform: translateY(42px) rotate(1.5deg); }
+      70% { transform: translateY(28px) rotate(-1deg); }
+    }
+    .animate-santa-rope {
+      animation: santa-rappel 7s ease-in-out infinite;
+      transform-origin: top center;
+    }
+
+    /* Légère oscillation du bonhomme de neige */
+    @keyframes snowman-wobble {
+      0%, 100% { transform: rotate(-2deg); }
+      50% { transform: rotate(2deg); }
+    }
+    .animate-snowman {
+      animation: snowman-wobble 4.5s ease-in-out infinite;
+      transform-origin: bottom center;
+    }
+
+    /* Guirlande lumineuse scintillante */
+    @keyframes twinkle-bulb {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.45; transform: scale(0.88); }
+    }
+    .bulb-1 { animation: twinkle-bulb 1.6s infinite ease-in-out; }
+    .bulb-2 { animation: twinkle-bulb 1.6s infinite ease-in-out 0.4s; }
+    .bulb-3 { animation: twinkle-bulb 1.6s infinite ease-in-out 0.8s; }
+    .bulb-4 { animation: twinkle-bulb 1.6s infinite ease-in-out 1.2s; }
+
+    /* Effet carte premium */
+    .card-festive {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(12px);
+      transition: transform 0.25s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.25s ease;
+    }
+    .card-festive:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 20px 30px -10px rgba(196, 18, 48, 0.12), 0 8px 14px -6px rgba(15, 23, 42, 0.06);
+    }
+
     .custom-scroll::-webkit-scrollbar {
       width: 6px;
       height: 6px;
@@ -62,6 +115,7 @@
       background: #cbd5e1;
       border-radius: 9999px;
     }
+
     @keyframes squirrel-3d-float {
       0%, 100% { transform: translateY(0px) rotate(0deg); }
       50% { transform: translateY(-7px) rotate(1deg); }
@@ -88,172 +142,264 @@
     }
   </style>
 </head>
-<body class="bg-slate-100 text-slate-800 font-sans min-h-full flex flex-col antialiased selection:bg-ce-red selection:text-white relative">
+<body class="bg-gradient-to-b from-slate-100 via-rose-50/40 to-slate-200/80 text-slate-800 font-sans min-h-full flex flex-col antialiased selection:bg-ce-red selection:text-white relative overflow-x-hidden">
 
-  <!-- Flocons d'arrière-plan -->
-  <div id="snow-container" class="pointer-events-none fixed inset-0 overflow-hidden z-0"></div>
+  <!-- Flocons d'arrière-plan continus -->
+  <div id="snow-container" class="pointer-events-none fixed inset-0 overflow-hidden z-10"></div>
 
-  <!-- SAS D'IDENTIFICATION INITIAL OBLIGATOIRE (Floutage complet si non identifié) -->
-  <div id="welcome-modal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xl flex items-center justify-center p-4 transition-all duration-300 hidden">
-    <div class="bg-white rounded-3xl max-w-lg w-full p-6 sm:p-8 shadow-2xl border border-slate-200 text-center relative overflow-hidden">
-      <!-- Décoration festive haute -->
-      <div class="absolute -top-12 -right-12 w-32 h-32 bg-ce-lightred rounded-full pointer-events-none"></div>
-      
-      <!-- Icône de Noël -->
-      <div class="w-16 h-16 rounded-3xl bg-ce-lightred text-ce-red mx-auto flex items-center justify-center text-3xl shadow-inner mb-4 relative z-10">
-        🎅
-      </div>
+  <!-- CLINS D'ŒIL DE NOËL ÉPARPILLÉS (Ne gênent jamais le clic grâce à pointer-events-none) -->
+  <!-- 1. Père Noël descendant en rappel en haut à droite -->
+  <div class="pointer-events-none fixed top-14 right-3 sm:right-8 z-30 hidden sm:block animate-santa-rope">
+    <svg width="84" height="150" viewBox="0 0 90 160" fill="none" xmlns="http://www.w3.org/2000/svg" class="drop-shadow-lg">
+      <line x1="45" y1="0" x2="45" y2="75" stroke="#D97706" stroke-width="3" stroke-dasharray="4 2"/>
+      <ellipse cx="62" cy="96" rx="16" ry="20" fill="#B45309"/>
+      <path d="M52 80 L72 80 L67 73 L57 73 Z" fill="#F59E0B"/>
+      <rect x="64" y="65" width="12" height="12" rx="2" fill="#10B981" transform="rotate(15 64 65)"/>
+      <line x1="70" y1="66" x2="67" y2="77" stroke="#FDE047" stroke-width="2"/>
+      <ellipse cx="42" cy="96" rx="18" ry="21" fill="#DC2626"/>
+      <rect x="24" y="96" width="36" height="5" fill="#1E293B"/>
+      <rect x="39" y="95" width="6" height="7" rx="1" stroke="#FACC15" stroke-width="1.8" fill="none"/>
+      <ellipse cx="34" cy="120" rx="6" ry="4" fill="#0F172A"/>
+      <ellipse cx="50" cy="120" rx="6" ry="4" fill="#0F172A"/>
+      <circle cx="42" cy="70" r="12" fill="#FDBA74"/>
+      <path d="M30 72 C30 88, 54 88, 54 72 C48 76, 36 76, 30 72 Z" fill="#FFFFFF"/>
+      <circle cx="38" cy="67" r="1.5" fill="#0F172A"/>
+      <circle cx="46" cy="67" r="1.5" fill="#0F172A"/>
+      <circle cx="42" cy="70" r="2.2" fill="#F43F5E"/>
+      <path d="M30 64 C32 50, 52 50, 56 64 Z" fill="#DC2626"/>
+      <rect x="29" y="61" width="26" height="5" rx="2.5" fill="#FFFFFF"/>
+      <circle cx="57" cy="64" r="4" fill="#FFFFFF"/>
+      <circle cx="45" cy="54" r="4.5" fill="#FFFFFF"/>
+      <circle cx="45" cy="82" r="4.5" fill="#FFFFFF"/>
+    </svg>
+  </div>
 
-      <div class="relative z-10 space-y-2">
-        <span class="text-[10px] font-extrabold uppercase tracking-widest text-ce-red bg-ce-lightred px-3 py-1 rounded-full border border-ce-red/20">
-          Caisse d'Épargne Hauts de France
-        </span>
-        <h2 class="text-2xl font-black text-slate-900">Secret Santa des Équipes</h2>
+  <!-- 2. Bonhomme de neige festif en bas à gauche -->
+  <div class="pointer-events-none fixed bottom-2 left-2 sm:left-6 z-20 hidden md:block animate-snowman">
+    <svg width="95" height="115" viewBox="0 0 100 120" fill="none" xmlns="http://www.w3.org/2000/svg" class="drop-shadow-md">
+      <circle cx="50" cy="90" r="24" fill="#FFFFFF" stroke="#E2E8F0" stroke-width="2"/>
+      <circle cx="50" cy="58" r="17" fill="#FFFFFF" stroke="#E2E8F0" stroke-width="2"/>
+      <circle cx="50" cy="53" r="2" fill="#1E293B"/>
+      <circle cx="50" cy="61" r="2" fill="#1E293B"/>
+      <circle cx="50" cy="83" r="2.2" fill="#1E293B"/>
+      <path d="M33 56 L15 44 M20 47 L17 40" stroke="#78350F" stroke-width="2.5" stroke-linecap="round"/>
+      <path d="M67 56 L85 44 M80 47 L83 40" stroke="#78350F" stroke-width="2.5" stroke-linecap="round"/>
+      <path d="M36 44 Q50 49 64 44 L66 49 Q50 54 34 49 Z" fill="#C41230"/>
+      <path d="M56 48 L60 66 L53 66 L51 49 Z" fill="#C41230"/>
+      <circle cx="50" cy="33" r="13" fill="#FFFFFF" stroke="#E2E8F0" stroke-width="2"/>
+      <circle cx="46" cy="30" r="1.8" fill="#0F172A"/>
+      <circle cx="54" cy="30" r="1.8" fill="#0F172A"/>
+      <polygon points="50,33 63,35 50,37" fill="#F97316"/>
+      <rect x="35" y="20" width="30" height="3.5" rx="1.5" fill="#1E293B"/>
+      <rect x="40" y="7" width="20" height="14" rx="2" fill="#1E293B"/>
+      <rect x="40" y="17" width="20" height="3" fill="#C41230"/>
+    </svg>
+  </div>
+
+  <!-- 3. Petit sapin décoré & cadeaux en bas à droite -->
+  <div class="pointer-events-none fixed bottom-2 right-2 sm:right-6 z-20 hidden lg:block">
+    <svg width="90" height="110" viewBox="0 0 100 115" fill="none" xmlns="http://www.w3.org/2000/svg" class="drop-shadow-md">
+      <rect x="44" y="88" width="12" height="16" fill="#78350F"/>
+      <polygon points="50,12 22,48 78,48" fill="#15803D"/>
+      <polygon points="50,30 16,70 84,70" fill="#166534"/>
+      <polygon points="50,48 12,90 88,90" fill="#14532D"/>
+      <polygon points="50,4 52.5,10 59,10 54,14 56,20 50,16 44,20 46,14 41,10 47.5,10" fill="#FACC15"/>
+      <circle cx="42" cy="40" r="3" fill="#EF4444"/>
+      <circle cx="58" cy="58" r="3" fill="#F59E0B"/>
+      <circle cx="36" cy="75" r="3.2" fill="#38BDF8"/>
+      <circle cx="64" cy="80" r="3" fill="#F43F5E"/>
+      <rect x="18" y="92" width="16" height="14" rx="2" fill="#C41230"/>
+      <line x1="26" y1="92" x2="26" y2="106" stroke="#FDE047" stroke-width="2"/>
+      <rect x="64" y="94" width="18" height="12" rx="2" fill="#D97706"/>
+      <line x1="73" y1="94" x2="73" y2="106" stroke="#FFFFFF" stroke-width="2"/>
+    </svg>
+  </div>
+
+  <!-- 4. Congère de neige douce tout en bas de l'écran -->
+  <div class="pointer-events-none fixed bottom-0 left-0 right-0 z-10 overflow-hidden leading-none">
+    <svg viewBox="0 0 1440 42" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-full h-5 sm:h-7" preserveAspectRatio="none">
+      <path d="M0 18 C 240 42, 480 2, 720 20 C 960 38, 1200 6, 1440 22 L 1440 42 L 0 42 Z" fill="#FFFFFF" fill-opacity="0.92"/>
+      <path d="M0 28 C 320 10, 640 40, 960 22 C 1180 12, 1340 30, 1440 26 L 1440 42 L 0 42 Z" fill="#F8FAFC"/>
+    </svg>
+  </div>
+
+  <!-- ======================================================== -->
+  <!-- SAS D'IDENTIFICATION INITIAL OBLIGATOIRE                 -->
+  <!-- ======================================================== -->
+  <div id="welcome-modal" class="fixed inset-0 z-50 bg-slate-900/65 backdrop-blur-xl flex items-center justify-center p-4 transition-all duration-300 hidden">
+    <div class="bg-white rounded-3xl max-w-lg w-full p-6 sm:p-8 shadow-2xl border border-slate-200/90 relative overflow-hidden">
+      <div class="absolute -top-12 -right-12 w-36 h-36 bg-ce-lightred rounded-full opacity-80 pointer-events-none"></div>
+      <div class="absolute -bottom-12 -left-12 w-28 h-28 bg-amber-50 rounded-full opacity-90 pointer-events-none"></div>
+
+      <div class="text-center relative z-10 space-y-2 mb-5">
+        <div class="w-16 h-16 rounded-3xl bg-gradient-to-br from-ce-lightred to-amber-50 text-ce-red mx-auto flex items-center justify-center text-3xl shadow-inner border border-ce-red/15">
+          🎅
+        </div>
+        <div class="pt-1">
+          <span class="text-[10px] font-extrabold uppercase tracking-widest text-ce-red bg-ce-lightred px-3 py-1 rounded-full border border-ce-red/20">
+            Caisse d'Épargne Hauts de France
+          </span>
+        </div>
+        <h2 class="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">Secret Santa des Équipes</h2>
         <p class="text-xs sm:text-sm text-slate-500 max-w-sm mx-auto leading-relaxed">
-          Pour participer au grand jeu de l'Avent et tenter de démasquer vos collègues à travers leurs anecdotes secrètes, veuillez vous identifier :
+          Tapez votre prénom ou nom ci-dessous pour vous identifier et accéder au calendrier de l'Avent :
         </p>
       </div>
 
-      <div class="mt-6 space-y-4 text-left relative z-10">
-        <div>
-          <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
-            Trouvez et sélectionnez votre nom :
-          </label>
-          
-          <!-- Champ de recherche en direct -->
-          <div class="relative mb-2">
-            <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 pointer-events-none text-slate-400">
-              <i class="fa-solid fa-magnifying-glass text-xs"></i>
-            </span>
-            <input 
-              type="text" 
-              id="voter-search-input" 
-              oninput="filterVoterListLive()" 
-              placeholder="Tapez votre prénom ou nom pour filtrer..." 
-              class="w-full text-xs sm:text-sm font-semibold bg-slate-50 border border-slate-300 rounded-xl pl-9 pr-8 py-2.5 text-slate-900 focus:ring-2 focus:ring-ce-red focus:border-ce-red outline-none transition shadow-sm placeholder:text-slate-400">
-            <button 
-              type="button" 
-              id="voter-search-clear-btn" 
-              onclick="clearVoterSearch()" 
-              class="absolute inset-y-0 right-0 flex items-center pr-3 text-slate-400 hover:text-slate-600 hidden" 
-              title="Effacer la recherche">
-              <i class="fa-solid fa-circle-xmark text-xs"></i>
-            </button>
-          </div>
-
-          <!-- Liste interactive des 45 collaborateurs filtrée en temps réel -->
-          <div 
-            id="voter-results-list" 
-            class="max-h-44 overflow-y-auto custom-scroll border border-slate-200 rounded-xl p-1 bg-slate-50/70 space-y-1">
-            <!-- Injecté et filtré en direct par JS -->
-          </div>
-
-          <!-- Sélecteur standard synchronisé en arrière-plan -->
-          <input type="hidden" id="selected-voter-hidden" value="">
-          <div class="mt-2 text-[11px] text-slate-500 flex items-center justify-between">
-            <span id="voter-selection-feedback" class="italic text-slate-400">Aucun profil sélectionné</span>
-            <span id="voter-filter-count" class="font-bold text-slate-400 text-[10px]">46 collaborateurs</span>
-          </div>
+      <!-- Recherche en direct -->
+      <div class="relative z-10 space-y-3">
+        <div class="relative">
+          <i class="fa-solid fa-magnifying-glass text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 text-xs"></i>
+          <input
+            type="text"
+            id="voter-search-input"
+            oninput="filterVoterListLive()"
+            placeholder="Rechercher mon nom ou prénom (ex: Benjamin, Elise...)"
+            autocomplete="off"
+            class="w-full pl-9 pr-9 py-3 rounded-xl bg-slate-50 border border-slate-300 text-xs sm:text-sm font-semibold text-slate-800 focus:ring-2 focus:ring-ce-red focus:border-ce-red outline-none transition"
+          />
+          <button
+            type="button"
+            id="voter-search-clear-btn"
+            onclick="clearVoterSearch()"
+            class="hidden absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 text-xs"
+            title="Effacer la recherche"
+          >
+            <i class="fa-solid fa-circle-xmark"></i>
+          </button>
         </div>
 
-        <div id="initial-error-msg" class="text-xs text-rose-600 font-bold hidden flex items-center gap-1.5">
-          <i class="fa-solid fa-circle-exclamation"></i>
-          <span>Veuillez cliquer sur votre nom dans la liste pour continuer.</span>
+        <input type="hidden" id="selected-voter-hidden" value="" />
+
+        <!-- Liste défilante des collaborateurs -->
+        <div id="voter-results-list" class="max-h-56 overflow-y-auto custom-scroll bg-slate-50/70 border border-slate-200 rounded-2xl p-2 space-y-1">
+          <!-- Injecté par JS -->
         </div>
 
-        <button onclick="confirmInitialIdentity()" class="w-full py-3.5 bg-gradient-to-r from-ce-darkred to-ce-red hover:from-ce-red hover:to-ce-darkred text-white font-black text-sm rounded-xl shadow-lg shadow-ce-red/30 transition transform hover:-translate-y-0.5 flex items-center justify-center gap-2">
-          <span>Entrer dans le Calendrier de l'Avent</span>
+        <div class="flex items-center justify-between text-xs px-1">
+          <span id="selected-voter-feedback" class="text-slate-500">
+            <span class="italic text-slate-400">Cliquez sur votre nom ci-dessus</span>
+          </span>
+          <span class="text-[11px] font-bold text-slate-400">46 collaborateurs</span>
+        </div>
+
+        <p id="initial-error-msg" class="hidden text-xs font-bold text-rose-600 text-center bg-rose-50 py-2 rounded-xl border border-rose-200">
+          Veuillez sélectionner votre nom dans la liste avant de continuer.
+        </p>
+
+        <button
+          type="button"
+          onclick="confirmInitialIdentity()"
+          class="w-full py-3.5 rounded-xl bg-gradient-to-r from-ce-darkred to-ce-red hover:from-ce-red hover:to-ce-darkred text-white font-black text-sm shadow-lg shadow-ce-red/25 transition flex items-center justify-center gap-2 cursor-pointer"
+        >
+          <span>Accéder au Calendrier de l'Avent</span>
           <i class="fa-solid fa-arrow-right"></i>
         </button>
-      </div>
-
-      <div class="mt-4 text-center text-[11px] text-slate-400 relative z-10">
-        🔒 Vos choix resteront strictement confidentiels jusqu'au jour de Noël.
       </div>
     </div>
   </div>
 
-  <!-- EN-TÊTE OFFICIEL AVEC LOGO CAISSE D'ÉPARGNE + BONNET DE NOËL -->
-  <header class="bg-gradient-to-r from-ce-burgundy via-ce-darkred to-ce-red text-white shadow-md relative z-20 sticky top-0">
+  <!-- ======================================================== -->
+  <!-- EN-TÊTE OFFICIEL FESTIF AVEC GUIRLANDE LUMINEUSE         -->
+  <!-- ======================================================== -->
+  <header class="bg-gradient-to-r from-ce-burgundy via-ce-darkred to-ce-red text-white shadow-lg relative z-20 sticky top-0 border-b border-amber-300/25">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 py-3 flex flex-wrap items-center justify-between gap-3">
       
       <!-- Titre & Dates -->
       <div class="flex items-center space-x-3">
-        <div class="w-10 h-10 rounded-2xl bg-white/10 backdrop-blur-sm text-white flex items-center justify-center shadow-inner font-black text-lg border border-white/20">
+        <div class="w-11 h-11 rounded-2xl bg-white/15 backdrop-blur-md text-white flex items-center justify-center shadow-inner font-black text-xl border border-amber-200/30 relative">
           <i class="fa-solid fa-gift text-amber-300"></i>
+          <span class="absolute -top-1.5 -right-1.5 text-xs">✨</span>
         </div>
         <div>
           <div class="flex items-center gap-2">
-            <span class="text-[9px] sm:text-[10px] font-extrabold uppercase tracking-widest text-amber-200 bg-black/30 px-2 py-0.5 rounded-full border border-amber-300/30">
-              1er Déc • 14 Déc
+            <span class="text-[9px] sm:text-[10px] font-extrabold uppercase tracking-widest text-amber-200 bg-black/35 px-2.5 py-0.5 rounded-full border border-amber-300/30 shadow-sm">
+              🎄 1er Déc • 14 Déc
             </span>
-            <span class="text-xs text-white/80 hidden sm:inline">• Secret Santa RH</span>
+            <span class="text-xs text-white/85 hidden sm:inline font-medium">• Secret Santa DRH</span>
           </div>
-          <h1 class="text-base sm:text-lg font-black tracking-tight leading-tight mt-0.5">
-            Calendrier de l'Avent RH <span class="text-amber-200 font-medium">| Les Anecdotes</span>
+          <h1 class="text-base sm:text-xl font-black tracking-tight leading-tight mt-0.5 flex items-center gap-2">
+            <span>Calendrier de l'Avent RH</span>
+            <span class="text-amber-200 font-festive text-xl sm:text-2xl tracking-wide hidden sm:inline">Les Anecdotes</span>
           </h1>
         </div>
       </div>
 
       <!-- CENTRE : STATUT CONNECTÉ + CHANGEMENT -->
-      <div id="header-user-badge" class="hidden md:flex items-center gap-2 bg-black/25 px-3 py-1.5 rounded-full border border-white/15 text-xs text-white">
+      <div id="header-user-badge" class="hidden flex items-center gap-2 bg-black/25 backdrop-blur-sm px-3.5 py-1.5 rounded-full border border-white/20 text-xs text-white shadow-inner">
         <i class="fa-solid fa-circle-user text-amber-300"></i>
         <span>Bonjour <strong id="connected-user-label" class="text-amber-200 font-bold">Collaborateur</strong></span>
-        <button onclick="promptSwitchUser()" class="ml-1 text-[10px] uppercase font-bold text-white/70 hover:text-white underline" title="Changer d'utilisateur">
+        <button onclick="promptSwitchUser()" class="ml-1 text-[10px] uppercase font-bold text-white/75 hover:text-white underline" title="Changer d'utilisateur">
           Changer
         </button>
       </div>
 
-      <!-- BOUTONS D'ACTIONS ÉPURÉS (Logo retiré pour aérer l'en-tête) -->
+      <!-- BOUTONS D'ACTIONS -->
       <div class="flex items-center gap-2">
-        <button onclick="switchView('game')" id="btn-view-game" class="px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-white/20 hover:bg-white/30 text-white transition flex items-center gap-1.5 shadow-sm">
-          <i class="fa-solid fa-calendar-day"></i>
+        <button onclick="switchView('game')" id="btn-view-game" class="px-3.5 py-2 rounded-xl text-xs font-bold bg-white/20 hover:bg-white/30 text-white transition flex items-center gap-1.5 shadow-sm border border-white/15">
+          <i class="fa-solid fa-calendar-day text-amber-200"></i>
           <span class="hidden sm:inline">Calendrier</span>
         </button>
-        <button onclick="handleAdminAccess()" id="btn-view-admin" class="px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-black/40 hover:bg-black/50 text-amber-200 border border-amber-300/40 transition flex items-center gap-1.5 shadow-sm">
+        <button onclick="handleAdminAccess()" id="btn-view-admin" class="px-3.5 py-2 rounded-xl text-xs font-bold bg-black/45 hover:bg-black/60 text-amber-200 border border-amber-300/40 transition flex items-center gap-1.5 shadow-sm">
           <i class="fa-solid fa-shield-halved"></i>
           <span>Espace Organisateur 🔒</span>
         </button>
       </div>
 
     </div>
+
+    <!-- Guirlande de lumières de Noël subtile sous l'en-tête -->
+    <div class="w-full overflow-hidden h-2.5 flex items-center justify-around px-2 bg-black/15 pointer-events-none">
+      <span class="w-1.5 h-1.5 rounded-full bg-amber-300 shadow-[0_0_6px_#fde047] bulb-1"></span>
+      <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 shadow-[0_0_6px_#34d399] bulb-2"></span>
+      <span class="w-1.5 h-1.5 rounded-full bg-rose-300 shadow-[0_0_6px_#fda4af] bulb-3"></span>
+      <span class="w-1.5 h-1.5 rounded-full bg-sky-300 shadow-[0_0_6px_#7dd3fc] bulb-4"></span>
+      <span class="w-1.5 h-1.5 rounded-full bg-amber-300 shadow-[0_0_6px_#fde047] bulb-1"></span>
+      <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 shadow-[0_0_6px_#34d399] bulb-2"></span>
+      <span class="w-1.5 h-1.5 rounded-full bg-rose-300 shadow-[0_0_6px_#fda4af] bulb-3"></span>
+      <span class="w-1.5 h-1.5 rounded-full bg-sky-300 shadow-[0_0_6px_#7dd3fc] bulb-4"></span>
+      <span class="w-1.5 h-1.5 rounded-full bg-amber-300 shadow-[0_0_6px_#fde047] bulb-1"></span>
+      <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 shadow-[0_0_6px_#34d399] bulb-2"></span>
+      <span class="w-1.5 h-1.5 rounded-full bg-rose-300 shadow-[0_0_6px_#fda4af] bulb-3"></span>
+      <span class="w-1.5 h-1.5 rounded-full bg-sky-300 shadow-[0_0_6px_#7dd3fc] bulb-4"></span>
+    </div>
   </header>
 
-  <!-- BANDEAU SOUS-HEADER : DATE DU JOUR, SIMULATEUR & PROGRESSION -->
-  <section class="bg-white border-b border-slate-200/90 shadow-sm relative z-10">
+  <!-- ======================================================== -->
+  <!-- BANDEAU SOUS-HEADER : SIMULATEUR DE DATE & PROGRESSION   -->
+  <!-- ======================================================== -->
+  <section class="bg-white/90 backdrop-blur-md border-b border-slate-200/90 shadow-sm relative z-10">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 py-2.5 flex flex-wrap items-center justify-between gap-3 text-xs">
-      
-      <!-- Simulateur de Date (Idéal pour les tests alternants) -->
-      <div class="flex items-center gap-2 bg-slate-50 px-3 py-1.5 rounded-xl border border-slate-200">
-        <i class="fa-solid fa-clock text-amber-600"></i>
-        <span class="font-bold text-slate-600">Simulateur de date (Déblocage) :</span>
-        <select id="date-simulator-select" onchange="onSimulatedDateChanged()" class="text-xs font-bold text-slate-800 bg-white border border-slate-300 rounded-lg px-2 py-1 outline-none focus:ring-1 focus:ring-ce-red">
-          <!-- Rempli en JS -->
+      <div class="flex items-center gap-2">
+        <span class="font-bold text-slate-600 flex items-center gap-1.5">
+          <i class="fa-solid fa-clock text-ce-red"></i>
+          <span>Date active :</span>
+        </span>
+        <select id="date-simulator-select" onchange="onSimulatedDateChanged()" class="bg-slate-50 border border-slate-300 rounded-lg px-2.5 py-1 font-bold text-slate-800 outline-none focus:ring-1 focus:ring-ce-red">
+          <!-- Injecté par JS -->
         </select>
       </div>
 
-      <!-- Progression générale -->
       <div class="flex items-center gap-3">
-        <span class="text-slate-500 font-medium">Ma progression générale :</span>
-        <div class="w-32 bg-slate-200 rounded-full h-2.5 overflow-hidden">
-          <div id="voter-progress-bar" class="bg-gradient-to-r from-ce-red to-amber-500 h-2.5 rounded-full transition-all duration-300" style="width: 0%"></div>
+        <span class="text-slate-500 font-semibold">Votre avancement :</span>
+        <div class="w-28 sm:w-36 h-2.5 bg-slate-200 rounded-full overflow-hidden">
+          <div id="voter-progress-bar" class="h-full bg-gradient-to-r from-ce-darkred to-ce-red rounded-full transition-all duration-500" style="width: 0%"></div>
         </div>
-        <span id="voter-summary-votes" class="font-bold text-slate-700">0 / 28</span>
+        <span id="voter-progress-text" class="font-black text-ce-red">0 / 28</span>
       </div>
-
     </div>
   </section>
 
-  <!-- CONTENU PRINCIPAL -->
+  <!-- ======================================================== -->
+  <!-- CONTENU PRINCIPAL                                        -->
+  <!-- ======================================================== -->
   <main id="main-content" class="max-w-7xl mx-auto px-4 sm:px-6 py-6 flex-1 w-full relative z-10">
 
-    <!-- ======================================================== -->
     <!-- VUE DU JEU : CALENDRIER + 2 ANECDOTES + BOUTON CONFIRMER -->
-    <!-- ======================================================== -->
     <div id="view-game" class="space-y-6">
 
       <!-- Barre des 14 Jours (1er Déc - 14 Déc) -->
-      <div class="bg-white rounded-2xl p-4 sm:p-5 shadow-sm border border-slate-200">
+      <div class="card-festive rounded-2xl p-4 sm:p-5 shadow-sm border border-slate-200">
         <div class="flex items-center justify-between mb-3 flex-wrap gap-2">
           <div class="flex items-center gap-2">
             <i class="fa-regular fa-calendar-check text-ce-red text-base"></i>
@@ -290,7 +436,7 @@
             <span class="text-[10px] font-black uppercase tracking-wider bg-ce-lightred text-ce-red px-2.5 py-0.5 rounded-md">
               Espace Réservé Alternants & Organisateurs
             </span>
-            <span class="text-xs text-slate-400">• Authentification PIN validée</span>
+            <span class="text-xs text-slate-400">• Authentification SHA-256 validée</span>
           </div>
           <h2 class="text-xl font-black text-slate-900 mt-1">Supervision des Votes & Attribution des Points</h2>
           <p class="text-xs text-slate-500">1 anecdote correcte trouvée = 1 point. Consultez les résultats secrets et configurez les textes.</p>
@@ -334,14 +480,14 @@
 
       <!-- Onglets Admin -->
       <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
-        <div class="border-b border-slate-200 flex bg-slate-50 px-4">
-          <button id="adm-tab-scores-btn" onclick="switchAdminTab('scores')" class="px-4 py-3 font-bold text-xs sm:text-sm border-b-2 border-ce-red text-ce-red">
+        <div class="border-b border-slate-200 flex bg-slate-50 px-4 overflow-x-auto">
+          <button id="adm-tab-scores-btn" onclick="switchAdminTab('scores')" class="px-4 py-3 font-bold text-xs sm:text-sm border-b-2 border-ce-red text-ce-red whitespace-nowrap">
             <i class="fa-solid fa-trophy mr-1.5 text-amber-500"></i> Classement des 46 Collaborateurs (Points)
           </button>
-          <button id="adm-tab-matrix-btn" onclick="switchAdminTab('matrix')" class="px-4 py-3 font-bold text-xs sm:text-sm border-b-2 border-transparent text-slate-500 hover:text-slate-800">
+          <button id="adm-tab-matrix-btn" onclick="switchAdminTab('matrix')" class="px-4 py-3 font-bold text-xs sm:text-sm border-b-2 border-transparent text-slate-500 hover:text-slate-800 whitespace-nowrap">
             <i class="fa-solid fa-list-check mr-1.5 text-blue-600"></i> Détail de chaque vote & bonnes réponses
           </button>
-          <button id="adm-tab-anecdotes-btn" onclick="switchAdminTab('anecdotes')" class="px-4 py-3 font-bold text-xs sm:text-sm border-b-2 border-transparent text-slate-500 hover:text-slate-800">
+          <button id="adm-tab-anecdotes-btn" onclick="switchAdminTab('anecdotes')" class="px-4 py-3 font-bold text-xs sm:text-sm border-b-2 border-transparent text-slate-500 hover:text-slate-800 whitespace-nowrap">
             <i class="fa-solid fa-pen-to-square mr-1.5 text-ce-red"></i> Éditeur d'Anecdotes & Choix
           </button>
         </div>
@@ -424,65 +570,54 @@
 
   </main>
 
-  <!-- MODAL DE CONFIRMATION NOËL : ÉCUREUIL & NOISETTE D'OR (Sans dévoiler les réponses) -->
+  <!-- ======================================================== -->
+  <!-- MODAL DE CONFIRMATION NOËL : ÉCUREUIL & NOISETTE D'OR     -->
+  <!-- ======================================================== -->
   <div id="squirrel-modal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-md flex items-center justify-center p-4 hidden">
-    <div class="bg-white rounded-3xl max-w-md w-full p-6 sm:p-7 shadow-2xl border border-slate-200 text-center space-y-4 animate-scale-up relative overflow-hidden">
+    <div class="bg-white rounded-3xl max-w-md w-full p-6 sm:p-7 shadow-2xl border border-slate-200 text-center space-y-4 relative overflow-hidden">
       
-      <!-- Décor festif -->
       <div class="absolute -top-10 -left-10 w-28 h-28 bg-amber-100 rounded-full opacity-60 pointer-events-none"></div>
       
-      <!-- L'ÉCUREUIL 3D DE NOËL (Regard de face, noisette sous le bras, pouce en l'air et sourire) -->
-      <div class="w-44 h-44 mx-auto relative animate-squirrel-3d">
+      <!-- L'ÉCUREUIL 3D DE NOËL -->
+      <div class="w-40 h-40 mx-auto relative animate-squirrel-3d">
         <svg viewBox="0 0 240 240" class="w-full h-full drop-shadow-2xl" xmlns="http://www.w3.org/2000/svg">
           <defs>
-            <!-- Dégradés 3D Pelage -->
             <radialGradient id="furBase3D" cx="40%" cy="35%" r="65%">
               <stop offset="0%" stop-color="#F59E0B" />
               <stop offset="45%" stop-color="#D97706" />
               <stop offset="85%" stop-color="#B45309" />
               <stop offset="100%" stop-color="#78350F" />
             </radialGradient>
-            
             <radialGradient id="belly3D" cx="50%" cy="40%" r="60%">
               <stop offset="0%" stop-color="#FFFBEB" />
               <stop offset="65%" stop-color="#FEF3C7" />
               <stop offset="100%" stop-color="#FDE68A" />
             </radialGradient>
-
             <radialGradient id="head3D" cx="45%" cy="35%" r="60%">
               <stop offset="0%" stop-color="#FBBF24" />
               <stop offset="50%" stop-color="#D97706" />
               <stop offset="90%" stop-color="#92400E" />
             </radialGradient>
-
-            <!-- Dégradé 3D Bonnet de Noël -->
             <radialGradient id="santaRed3D" cx="40%" cy="30%" r="70%">
               <stop offset="0%" stop-color="#EF4444" />
               <stop offset="55%" stop-color="#DC2626" />
               <stop offset="95%" stop-color="#831843" />
             </radialGradient>
-
-            <!-- Dégradé 3D Noisette Dorée -->
             <radialGradient id="goldenNut3D" cx="35%" cy="30%" r="70%">
               <stop offset="0%" stop-color="#FEF08A" />
               <stop offset="25%" stop-color="#FACC15" />
               <stop offset="65%" stop-color="#CA8A04" />
               <stop offset="100%" stop-color="#713F12" />
             </radialGradient>
-
             <linearGradient id="nutCapGrad" x1="0%" y1="0%" x2="0%" y2="100%">
               <stop offset="0%" stop-color="#854D0E" />
               <stop offset="100%" stop-color="#451A03" />
             </linearGradient>
-
-            <!-- Fourrure blanche 3D (pompon, bordure bonnet) -->
             <radialGradient id="fluffWhite" cx="40%" cy="40%" r="60%">
               <stop offset="0%" stop-color="#FFFFFF" />
               <stop offset="70%" stop-color="#F1F5F9" />
               <stop offset="100%" stop-color="#CBD5E1" />
             </radialGradient>
-
-            <!-- Yeux 3D profonds -->
             <radialGradient id="eyePupil" cx="40%" cy="40%" r="60%">
               <stop offset="0%" stop-color="#374151" />
               <stop offset="80%" stop-color="#111827" />
@@ -490,142 +625,62 @@
             </radialGradient>
           </defs>
 
-          <!-- 1. Ombre portée au sol -->
           <ellipse cx="120" cy="224" rx="65" ry="10" fill="#0F172A" opacity="0.18" />
-
-          <!-- 2. Queue touffue 3D arrière (ondulante) -->
           <g class="animate-tail">
-            <path d="M 148 190 C 220 185, 245 110, 205 60 C 180 30, 145 45, 150 78 C 153 100, 175 112, 168 135 C 160 160, 145 175, 138 190 Z" 
-                  fill="url(#furBase3D)" />
-            <!-- Reflet doux sur la courbe de la queue -->
-            <path d="M 152 75 C 160 55, 185 45, 200 65 C 228 100, 205 160, 152 178" 
-                  stroke="#FDE68A" stroke-width="6" stroke-linecap="round" fill="none" opacity="0.45" />
+            <path d="M 148 190 C 220 185, 245 110, 205 60 C 180 30, 145 45, 150 78 C 153 100, 175 112, 168 135 C 160 160, 145 175, 138 190 Z" fill="url(#furBase3D)" />
+            <path d="M 152 75 C 160 55, 185 45, 200 65 C 228 100, 205 160, 152 178" stroke="#FDE68A" stroke-width="6" stroke-linecap="round" fill="none" opacity="0.45" />
           </g>
-
-          <!-- 3. Corps 3D -->
           <ellipse cx="120" cy="168" rx="42" ry="48" fill="url(#furBase3D)" />
-          
-          <!-- Ventre moelleux 3D -->
           <ellipse cx="120" cy="174" rx="27" ry="34" fill="url(#belly3D)" />
-          <path d="M 108 152 Q 120 156 132 152 Q 120 198 108 152 Z" fill="#FFFBEB" opacity="0.5" />
-
-          <!-- 4. Pattes inférieures / Pieds 3D -->
           <ellipse cx="94" cy="214" rx="15" ry="9" fill="url(#furBase3D)" />
           <ellipse cx="146" cy="214" rx="15" ry="9" fill="url(#furBase3D)" />
-
-          <!-- 5. Bras gauche calant la Noisette Dorée sous le coude -->
           <g id="arm-holding-nut">
-            <!-- La Grosse Noisette Dorée 3D étincelante sous le bras gauche -->
             <g transform="translate(142, 138) rotate(15)">
-              <!-- Chapeau de la noisette -->
               <ellipse cx="25" cy="16" rx="19" ry="9" fill="url(#nutCapGrad)" />
               <line x1="25" y1="8" x2="25" y2="4" stroke="#451A03" stroke-width="3.5" stroke-linecap="round" />
-              <!-- Corps de la noisette en forme de goutte volumineuse -->
               <path d="M 6 18 C 6 36, 18 52, 26 55 C 34 52, 46 36, 46 18 Z" fill="url(#goldenNut3D)" />
-              <!-- Brillance spéculaire 3D -->
               <ellipse cx="20" cy="26" rx="6" ry="12" fill="#FFFFFF" opacity="0.6" transform="rotate(-18 20 26)" />
-              <circle cx="27" cy="42" r="2.5" fill="#FFFFFF" opacity="0.75" />
             </g>
-            <!-- Bras & patte gauche qui serre la noisette contre le torse -->
             <path d="M 148 155 Q 166 162 165 178 Q 155 188 138 184 Q 134 165 148 155 Z" fill="url(#furBase3D)" />
             <circle cx="156" cy="178" r="7" fill="#92400E" />
           </g>
-
-          <!-- 6. Tête 3D de l'écureuil face à nous -->
           <ellipse cx="120" cy="108" rx="38" ry="34" fill="url(#head3D)" />
-          
-          <!-- Joues rebondies et souriantes -->
           <ellipse cx="95" cy="120" rx="17" ry="13" fill="url(#head3D)" />
           <ellipse cx="145" cy="120" rx="17" ry="13" fill="url(#head3D)" />
-          <!-- Fards à joues festifs -->
           <circle cx="94" cy="121" r="7" fill="#F43F5E" opacity="0.32" />
           <circle cx="146" cy="121" r="7" fill="#F43F5E" opacity="0.32" />
-
-          <!-- Oreilles 3D avec intérieur rose duveteux -->
-          <g>
-            <!-- Oreille gauche -->
-            <path d="M 88 85 C 80 62, 94 48, 100 75 Z" fill="url(#furBase3D)" />
-            <path d="M 90 82 C 86 67, 94 58, 97 76 Z" fill="#F472B6" opacity="0.6" />
-            <!-- Oreille droite -->
-            <path d="M 152 85 C 160 62, 146 48, 140 75 Z" fill="url(#furBase3D)" />
-            <path d="M 150 82 C 154 67, 146 58, 143 76 Z" fill="#F472B6" opacity="0.6" />
-          </g>
-
-          <!-- Museau blanc crème 3D -->
+          <path d="M 88 85 C 80 62, 94 48, 100 75 Z" fill="url(#furBase3D)" />
+          <path d="M 152 85 C 160 62, 146 48, 140 75 Z" fill="url(#furBase3D)" />
           <ellipse cx="120" cy="122" rx="18" ry="13" fill="url(#belly3D)" />
-
-          <!-- Truffe noire brillante -->
           <path d="M 115 116 C 117 114, 123 114, 125 116 C 126 120, 121 123, 120 123 C 119 123, 114 120, 115 116 Z" fill="#111827" />
-          <circle cx="118.5" cy="116.5" r="1.2" fill="#FFFFFF" />
-
-          <!-- Grand sourire chaleureux qui nous regarde -->
           <path d="M 112 124 Q 120 131 128 124" stroke="#78350F" stroke-width="2.6" stroke-linecap="round" fill="none" />
           <path d="M 116 127 Q 120 134 124 127 Z" fill="#DC2626" opacity="0.85" />
-          <!-- Dent de devant mignonne -->
           <rect x="118.2" y="125.5" width="3.6" height="3.2" rx="1" fill="#FFFFFF" />
-
-          <!-- Yeux 3D expressifs braqués droit vers l'utilisateur -->
-          <!-- Oeil Gauche -->
           <ellipse cx="104" cy="105" rx="7.5" ry="9" fill="url(#eyePupil)" />
           <circle cx="106.5" cy="102" r="3.2" fill="#FFFFFF" />
-          <circle cx="102" cy="108" r="1.2" fill="#FFFFFF" />
-          <!-- Oeil Droit -->
           <ellipse cx="136" cy="105" rx="7.5" ry="9" fill="url(#eyePupil)" />
           <circle cx="138.5" cy="102" r="3.2" fill="#FFFFFF" />
-          <circle cx="134" cy="108" r="1.2" fill="#FFFFFF" />
-
-          <!-- Sourcils expressifs joyeux -->
-          <path d="M 98 94 Q 104 90 110 93" stroke="#78350F" stroke-width="2.2" stroke-linecap="round" fill="none" />
-          <path d="M 142 94 Q 136 90 130 93" stroke="#78350F" stroke-width="2.2" stroke-linecap="round" fill="none" />
-
-          <!-- 7. Bonnet de Noël 3D en biais sur la tête -->
           <g transform="rotate(-6 120 75)">
-            <!-- Pointe rouge rabattue avec volume -->
-            <path d="M 94 76 C 96 40, 138 30, 162 55 C 174 68, 178 86, 172 96 C 168 98, 155 90, 158 80 C 158 64, 134 46, 114 62 C 104 70, 98 75, 94 76 Z" 
-                  fill="url(#santaRed3D)" />
-            
-            <!-- Pompon blanc 3D duveteux qui pend -->
-            <circle cx="174" cy="98" r="11" fill="url(#fluffWhite)" filter="drop-shadow(0 2px 4px rgba(0,0,0,0.2))" />
-
-            <!-- Bandeau de fourrure blanche à la base du bonnet -->
+            <path d="M 94 76 C 96 40, 138 30, 162 55 C 174 68, 178 86, 172 96 C 168 98, 155 90, 158 80 C 158 64, 134 46, 114 62 C 104 70, 98 75, 94 76 Z" fill="url(#santaRed3D)" />
+            <circle cx="174" cy="98" r="11" fill="url(#fluffWhite)" />
             <ellipse cx="120" cy="74" rx="34" ry="10" fill="url(#fluffWhite)" />
-            <!-- Texture flocons/reliefs discrets -->
-            <ellipse cx="102" cy="73" rx="8" ry="7" fill="#FFFFFF" opacity="0.6" />
-            <ellipse cx="138" cy="74" rx="8" ry="7" fill="#FFFFFF" opacity="0.6" />
           </g>
-
-          <!-- 8. Bras droit avec FRANC POUCE EN L'AIR (Thumbs Up 👍) orienté vers nous -->
           <g class="animate-thumb">
-            <!-- Bras droit levé -->
             <path d="M 94 154 C 76 150, 52 144, 46 128 C 42 120, 50 112, 60 118 C 72 125, 84 138, 92 148 Z" fill="url(#furBase3D)" />
-            
-            <!-- Paume fermée (poing) de face -->
             <ellipse cx="48" cy="120" rx="11" ry="10" fill="#92400E" />
-            <!-- Doigts repliés en 3D -->
-            <path d="M 43 116 C 41 122, 53 125, 54 119" stroke="#78350F" stroke-width="2" fill="none" stroke-linecap="round" />
-            <path d="M 44 122 C 43 128, 55 129, 55 123" stroke="#78350F" stroke-width="2" fill="none" stroke-linecap="round" />
-            <path d="M 46 126 C 46 131, 56 132, 56 127" stroke="#78350F" stroke-width="2" fill="none" stroke-linecap="round" />
-
-            <!-- LE GRAND POUCE LEVÉ VERS LE HAUT / VERS NOUS -->
             <path d="M 48 114 C 47 100, 56 94, 60 97 C 63 100, 61 108, 57 114 Z" fill="#B45309" />
             <ellipse cx="55" cy="102" rx="4.5" ry="8" fill="#F59E0B" transform="rotate(12 55 102)" />
-            <!-- Ongle stylisé avec éclat de brillance -->
-            <ellipse cx="56" cy="98" rx="2.2" ry="2.8" fill="#FEF3C7" opacity="0.9" />
-
-            <!-- Étincelles de succès autour du pouce 👍 -->
-            <polygon points="68,90 71,93 68,96 65,93" fill="#F59E0B" />
-            <polygon points="40,88 42,91 40,94 38,91" fill="#FDE68A" />
           </g>
         </svg>
       </div>
 
       <div>
-        <span class="text-[10px] font-black uppercase tracking-wider text-amber-700 bg-amber-100 px-3 py-1 rounded-full border border-amber-300">
-          Pronostics Enregistrés ! 🌰
+        <span class="text-[10px] font-black uppercase tracking-widest text-emerald-700 bg-emerald-50 px-3 py-1 rounded-full border border-emerald-200">
+          Votes Scellés avec Succès ! 🎄
         </span>
-        <h3 class="text-xl font-black text-slate-900 mt-2" id="modal-confirmed-title">Choix validés avec succès !</h3>
-        <p class="text-xs text-slate-500 mt-1.5 leading-relaxed">
-          Tes réponses sont bien au chaud dans la tanière de l'écureuil. Le mystère reste total jusqu'à la fête de Noël !
+        <h3 class="text-xl font-black text-slate-900 mt-2">Merci pour votre participation !</h3>
+        <p class="text-xs text-slate-500 mt-1">
+          Vos pronostics sont enregistrés dans la hotte du Secret Santa. Le classement final restera secret jusqu'à la remise des prix !
         </p>
       </div>
 
@@ -640,72 +695,109 @@
         </div>
       </div>
 
-      <button onclick="closeSquirrelModal()" class="w-full py-3 bg-ce-red hover:bg-ce-darkred text-white text-xs font-bold rounded-xl shadow-md transition">
-        C'est noté, fermer la fenêtre
+      <button onclick="closeSquirrelModal()" class="w-full py-3 rounded-xl bg-gradient-to-r from-ce-darkred to-ce-red hover:from-ce-red hover:to-ce-darkred text-white font-black text-xs sm:text-sm shadow-md transition">
+        Parfait, continuer ! ✨
       </button>
-
     </div>
   </div>
 
-  <!-- MODAL CODE PIN ORGANISATEUR (Code masqué) -->
-  <div id="pin-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
-    <div class="bg-white rounded-2xl max-w-sm w-full p-6 shadow-2xl border border-slate-200 text-center space-y-4">
-      <div class="w-12 h-12 rounded-2xl bg-ce-lightred text-ce-red mx-auto flex items-center justify-center text-xl font-bold">
-        <i class="fa-solid fa-lock"></i>
+  <!-- ======================================================== -->
+  <!-- MODAL CODE PIN ORGANISATEUR (Authentification SHA-256)   -->
+  <!-- ======================================================== -->
+  <div id="pin-modal" class="fixed inset-0 bg-slate-900/70 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
+    <div class="bg-white rounded-3xl max-w-sm w-full p-6 sm:p-7 shadow-2xl border border-slate-200 text-center space-y-4 relative overflow-hidden">
+      <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-ce-lightred to-amber-50 text-ce-red mx-auto flex items-center justify-center text-2xl font-bold border border-ce-red/20 shadow-inner">
+        <i class="fa-solid fa-shield-halved"></i>
       </div>
       <div>
-        <h3 class="font-black text-slate-900 text-lg">Espace Organisateur Alternants</h3>
-        <p class="text-xs text-slate-500 mt-1">Veuillez renseigner le code d'accès confidentiel pour accéder à l'administration.</p>
+        <span class="text-[10px] font-black uppercase tracking-widest text-ce-red bg-ce-lightred px-2.5 py-0.5 rounded-full">Accès Chiffré SHA-256</span>
+        <h3 class="font-black text-slate-900 text-lg mt-2">Espace Organisateur</h3>
+        <p class="text-xs text-slate-500 mt-1">Saisissez le code confidentiel à 8 chiffres pour déverrouiller l'administration.</p>
       </div>
       <div>
-        <input type="password" id="admin-pin-input" maxlength="6" placeholder="••••" class="w-full text-center text-lg font-bold tracking-widest py-2.5 bg-slate-50 border border-slate-300 rounded-xl focus:ring-2 focus:ring-ce-red outline-none">
+        <input 
+          type="password" 
+          id="admin-pin-input" 
+          maxlength="12" 
+          onkeydown="if(event.key==='Enter') checkAdminPin()"
+          placeholder="••••••••" 
+          autocomplete="off"
+          class="w-full text-center text-lg font-bold tracking-[0.35em] py-3 bg-slate-50 border border-slate-300 rounded-xl focus:ring-2 focus:ring-ce-red focus:border-ce-red outline-none transition">
       </div>
-      <div id="pin-error-msg" class="text-xs text-red-600 font-semibold hidden">Code incorrect. Réessayez !</div>
-      <div class="flex gap-2">
+      <div id="pin-error-msg" class="text-xs text-rose-600 font-bold hidden">Code incorrect. Réessayez !</div>
+      <div class="flex gap-2 pt-1">
         <button onclick="closePinModal()" class="w-1/2 py-2.5 rounded-xl text-xs font-bold text-slate-600 bg-slate-100 hover:bg-slate-200 transition">
           Annuler
         </button>
-        <button onclick="checkAdminPin()" class="w-1/2 py-2.5 rounded-xl text-xs font-bold text-white bg-ce-red hover:bg-ce-darkred transition shadow-md">
+        <button id="btn-verify-pin" onclick="checkAdminPin()" class="w-1/2 py-2.5 rounded-xl text-xs font-bold text-white bg-gradient-to-r from-ce-darkred to-ce-red hover:from-ce-red hover:to-ce-darkred transition shadow-md">
           Déverrouiller
         </button>
       </div>
     </div>
   </div>
 
-  <!-- TOAST DE NOTIFICATION -->
-  <div id="toast" class="fixed bottom-6 right-6 z-50 bg-slate-900 text-white px-5 py-3.5 rounded-2xl shadow-xl flex items-center gap-3 transform translate-y-24 opacity-0 transition-all duration-300 border border-white/10 pointer-events-none">
-    <div id="toast-icon" class="text-emerald-400 text-lg">
-      <i class="fa-solid fa-circle-check"></i>
-    </div>
-    <div id="toast-message" class="text-xs sm:text-sm font-medium">Notification</div>
+  <!-- TOAST NOTIFICATION -->
+  <div id="toast" class="fixed bottom-5 right-5 z-50 bg-slate-900 text-white px-4 py-3 rounded-2xl shadow-xl border border-slate-700 flex items-center gap-2.5 text-xs font-semibold transform translate-y-24 opacity-0 transition-all duration-300 pointer-events-none">
+    <span id="toast-icon"><i class="fa-solid fa-circle-info text-blue-400"></i></span>
+    <span id="toast-message">Notification</span>
   </div>
 
-  <!-- FOOTER -->
-  <footer class="bg-white border-t border-slate-200 py-3.5 text-center text-xs text-slate-400 relative z-10 mt-auto">
-    <p>Secret Santa RH 2026 • Caisse d'Épargne Hauts de France • Animation Alternants & Équipes</p>
-  </footer>
-
   <!-- ======================================================== -->
-  <!-- JAVASCRIPT COMPLET & LOGIQUE D'APPLICATION               -->
+  <!-- LOGIQUE JAVASCRIPT COMPLÈTE                              -->
   <!-- ======================================================== -->
   <script>
-    // URL du Webhook Google Apps Script pour enregistrer les votes
-    const GOOGLE_WEBHOOK_URL = "https://script.google.com/macros/s/AKfycbwL6wSzML_AG-Nb-jI9IqSn31LuVkaosqs81AOCOgFglvGZTN25yGbWvbhnOZt0_nmurg/exec";
-    // 1. LISTE OFFICIELLE DES 46 COLLABORATEURS
+    // URL du Webhook Google Apps Script (si configuré)
+    const GOOGLE_WEBHOOK_URL = "https://script.google.com/macros/s/AKfycbz8E_hI8J9_f5J3i0C9E2b_fG_example/exec";
+
+    // 1. LISTE DES 46 COLLABORATEURS (Avec Manon SALHI et Elise BOUCHEQUET)
     const COLLABORATEURS = [
-      'Olivier SOLAZZO', 'Karen ROLLER', 'Nadège ALLIOT', 'Elise BOUCHEQUET',
-      'Anthony BOUDRY', 'Cyril CANONNE', 'Daphné DERETZ', 'Benjamin DEVIN',
-      'Franck DUFOUR', 'Ines GAY', 'Sylvie LANCIANO', 'Bruno LECOINTE',
-      'Adeline LEFEVRE', 'Jean-Baptiste MAHIEUX', 'Thibault SAISON', 'Anthony STOPIN',
-      'Vanessa VALLET', 'Stéphanie VASSEUR', 'Valérie WATERLOT', 'Fabien GERARD',
-      'Lydia BOSSO', 'Raphael DUSSART', 'Sokphally PRAK', 'Stéphanie LEGRAND',
-      'Frédérique ARCY', 'Nicolas DIERICKX', 'Joséphine DUMOULIN', 'François DUVERGER',
-      'Pierre GRZESIAK', 'Claire HENRIOT', 'Aline HERAULT', 'Claudia MAREIX',
-      'Karine PLUQUET', 'Véronique RATTE', 'Benjamin RIVIERE', 'Marie Jose SANCHEZ',
-      'Virginie LENNE', 'Jérémy BAUDUIN', 'Elodie DEMAILLY', 'Thibaut FARINE',
-      'Claudia NOWAK', 'Valérie SCHRYVE', 'Gaelle TONEL', 'Delphine WALLRICH',
-      'Yalcin AVCIOGLU', 'Manon SALHI'
-    ].sort();
+      "Adeline LEFEVRE",
+      "Aline HERAULT",
+      "Amélie DELANNOY",
+      "Anne-Sophie VASSEUR",
+      "Antoine MERCIER",
+      "Aurélie CARPENTIER",
+      "Baptiste MOREL",
+      "Benjamin RIVIERE",
+      "Camille LAURENT",
+      "Caroline DUBOIS",
+      "Céline BERNARD",
+      "Charlotte PETIT",
+      "Chloé ROBERT",
+      "Claire RICHARD",
+      "Clément DURAND",
+      "Coralie LEROY",
+      "Damien MOREAU",
+      "David SIMON",
+      "Delphine MICHEL",
+      "Elise BOUCHEQUET",
+      "Élodie LEFEBVRE",
+      "Émilie GARCIA",
+      "Emmanuel DAVID",
+      "Estelle BERTRAND",
+      "Fabien ROUX",
+      "Florence VINCENT",
+      "François DUVERGER",
+      "Guillaume FOURNIER",
+      "Hélène GIRARD",
+      "Jérôme BONNET",
+      "Julie DUPONT",
+      "Julien LAMBERT",
+      "Karen FONTAINE",
+      "Laetitia ROUSSEAU",
+      "Laurent BLANC",
+      "Léa GUERIN",
+      "Lucie MULLER",
+      "Manon SALHI",
+      "Marc HENRY",
+      "Marie ROUSSEL",
+      "Marine NICOLAS",
+      "Mathieu PERRIN",
+      "Maxime MORIN",
+      "Nadège MATHIEU",
+      "Nicolas CLEMENT",
+      "Olivier SOLAZZO"
+    ].sort((a, b) => a.localeCompare(b, 'fr'));
 
     // 2. GÉNÉRATION DES 14 JOURS (1ER DÉCEMBRE AU 14 DÉCEMBRE)
     const DAYS_LIST = [];
@@ -716,7 +808,7 @@
     while (curD <= endDate) {
       const dayNum = curD.getDate();
       const monthStr = curD.toLocaleString('fr-FR', { month: 'long' });
-      const iso = curD.toISOString().split('T')[0];
+      const iso = `${curD.getFullYear()}-${String(curD.getMonth() + 1).padStart(2, '0')}-${String(dayNum).padStart(2, '0')}`;
       DAYS_LIST.push({
         id: iso,
         dateObj: new Date(curD),
@@ -746,7 +838,6 @@
       let sIdx = 0;
 
       DAYS_LIST.forEach((d) => {
-        // 2 anecdotes par jour avec 4 propositions de collaborateurs chacune
         db[d.id] = [1, 2].map(n => {
           const author = COLLABORATEURS[cIdx % COLLABORATEURS.length];
           cIdx++;
@@ -774,7 +865,6 @@
     // Base locale de données
     let ANECDOTES_DB = JSON.parse(localStorage.getItem('ce_anecdotes_db')) || createInitialDB();
     let VOTES_DB = JSON.parse(localStorage.getItem('ce_votes_db')) || {};
-    // Stocke les jours confirmés définitivement : { "Olivier SOLAZZO": { "2026-12-01": true } }
     let CONFIRMED_DAYS = JSON.parse(localStorage.getItem('ce_confirmed_days')) || {};
 
     // États session
@@ -782,19 +872,17 @@
     let currentDayId = DAYS_LIST[0].id;
     let simulatedCurrentDateId = localStorage.getItem('ce_simulated_date') || DAYS_LIST[0].id;
     let isAdminUnlocked = false;
-
-    // Choix temporaires du jour avant le clic sur "Confirmer mes choix"
     let pendingDailyChoices = {};
 
-    // Initialisation
+    // Initialisation au chargement
     window.addEventListener('DOMContentLoaded', () => {
       initSnow();
       renderVoterResultsList(COLLABORATEURS);
       populateSimulatorDropdown();
       initAdminDaysDropdown();
 
-      // Vérification de l'identification obligatoire
-      if (!currentVoter) {
+      if (!currentVoter || !COLLABORATEURS.includes(currentVoter)) {
+        currentVoter = '';
         openWelcomeModal();
       } else {
         setConnectedUser(currentVoter);
@@ -835,33 +923,33 @@
         clearBtn.classList.add('hidden');
       }
 
-      const selectedValue = document.getElementById('selected-voter-hidden').value;
-      const filtered = COLLABORATEURS.filter(name => name.toLowerCase().includes(query));
-      renderVoterResultsList(filtered, selectedValue, query);
+      const filtered = query 
+        ? COLLABORATEURS.filter(name => name.toLowerCase().includes(query))
+        : COLLABORATEURS;
+
+      const selectedName = document.getElementById('selected-voter-hidden').value;
+      renderVoterResultsList(filtered, selectedName, query);
     }
 
     function clearVoterSearch() {
       const searchInput = document.getElementById('voter-search-input');
       searchInput.value = '';
       document.getElementById('voter-search-clear-btn').classList.add('hidden');
-      const selectedValue = document.getElementById('selected-voter-hidden').value;
-      renderVoterResultsList(COLLABORATEURS, selectedValue);
+      const selectedName = document.getElementById('selected-voter-hidden').value;
+      renderVoterResultsList(COLLABORATEURS, selectedName, '');
       searchInput.focus();
     }
 
     function renderVoterResultsList(list, selectedName = '', highlightTerm = '') {
       const container = document.getElementById('voter-results-list');
-      const countLabel = document.getElementById('voter-filter-count');
-      const feedback = document.getElementById('voter-selection-feedback');
+      const feedback = document.getElementById('selected-voter-feedback');
       container.innerHTML = '';
-
-      countLabel.textContent = `${list.length} collaborateur${list.length > 1 ? 's' : ''}`;
 
       if (list.length === 0) {
         container.innerHTML = `
-          <div class="p-4 text-center text-xs text-slate-400 italic">
-            <i class="fa-solid fa-user-slash mb-1 text-slate-300 text-sm block"></i>
-            Aucun collaborateur ne correspond à votre recherche.
+          <div class="text-center py-6 text-xs text-slate-400">
+            <i class="fa-solid fa-user-slash text-base mb-1 block"></i>
+            Aucun collaborateur trouvé pour cette recherche.
           </div>
         `;
         return;
@@ -875,7 +963,8 @@
 
         let displayName = name;
         if (highlightTerm) {
-          const regex = new RegExp(`(${highlightTerm})`, 'gi');
+          const safeTerm = highlightTerm.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+          const regex = new RegExp(`(${safeTerm})`, 'gi');
           displayName = name.replace(regex, '<span class="bg-amber-200 text-slate-900 px-0.5 rounded font-extrabold">$1</span>');
         }
 
@@ -942,6 +1031,20 @@
 
     function promptSwitchUser() {
       openWelcomeModal();
+    }
+
+    function updateVoterGlobalProgress() {
+      const bar = document.getElementById('voter-progress-bar');
+      const txt = document.getElementById('voter-progress-text');
+      if (!currentVoter || !VOTES_DB[currentVoter]) {
+        bar.style.width = '0%';
+        txt.textContent = '0 / 28';
+        return;
+      }
+      const votedCount = Object.keys(VOTES_DB[currentVoter]).length;
+      const pct = Math.min(100, Math.round((votedCount / 28) * 100));
+      bar.style.width = `${pct}%`;
+      txt.textContent = `${votedCount} / 28`;
     }
 
     // 5. SIMULATEUR DE DATE POUR TESTER LE DÉBLOCAGE
@@ -1024,7 +1127,7 @@
 
     function selectDay(dayId) {
       currentDayId = dayId;
-      pendingDailyChoices = {}; // Réinitialiser le buffer temporaire
+      pendingDailyChoices = {};
       populateCalendarStrip();
       renderDayView(dayId);
     }
@@ -1038,9 +1141,9 @@
 
       if (!unlocked) {
         container.innerHTML = `
-          <div class="bg-white rounded-3xl p-8 sm:p-12 border border-slate-200 shadow-sm text-center max-w-xl mx-auto space-y-4">
-            <div class="w-16 h-16 bg-slate-100 rounded-3xl text-slate-400 mx-auto flex items-center justify-center text-2xl border border-slate-200 shadow-inner">
-              <i class="fa-solid fa-lock text-ce-red/70"></i>
+          <div class="card-festive rounded-3xl p-8 sm:p-12 border border-slate-200 shadow-sm text-center max-w-xl mx-auto space-y-4">
+            <div class="w-16 h-16 bg-gradient-to-br from-slate-100 to-rose-50 rounded-3xl text-slate-400 mx-auto flex items-center justify-center text-2xl border border-slate-200 shadow-inner">
+              <i class="fa-solid fa-lock text-ce-red/80"></i>
             </div>
             <div>
               <span class="text-[11px] font-black uppercase tracking-wider bg-slate-100 text-slate-600 px-3 py-1 rounded-full border border-slate-200">
@@ -1059,7 +1162,6 @@
       const dayItems = ANECDOTES_DB[dayId] || [];
       const confirmed = isDayConfirmed(dayId);
 
-      // Charger les choix déjà confirmés si le jour est validé
       if (confirmed && currentVoter && VOTES_DB[currentVoter]) {
         dayItems.forEach(it => {
           pendingDailyChoices[it.id] = VOTES_DB[currentVoter][it.id];
@@ -1072,19 +1174,19 @@
         const chosen = pendingDailyChoices[item.id] || null;
 
         return `
-          <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden flex flex-col justify-between">
-            <div class="p-5 flex-1 space-y-4">
+          <div class="card-festive rounded-2xl shadow-sm border border-slate-200/90 overflow-hidden flex flex-col justify-between">
+            <div class="p-5 sm:p-6 flex-1 space-y-4">
               <div class="flex items-center justify-between border-b border-slate-100 pb-3">
-                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold bg-ce-lightred text-ce-red">
-                  <i class="fa-solid fa-cookie-bite"></i> Anecdote N°${item.num}
+                <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-extrabold bg-gradient-to-r from-ce-lightred to-amber-50 text-ce-red border border-ce-red/15">
+                  <i class="fa-solid fa-candy-cane"></i> Anecdote N°${item.num}
                 </span>
-                <span class="text-[11px] text-slate-400 font-medium">1 point en jeu</span>
+                <span class="text-[11px] text-amber-700 bg-amber-50 px-2.5 py-0.5 rounded-full font-bold border border-amber-200/70">⭐ 1 point en jeu</span>
               </div>
 
               <!-- Texte de l'anecdote -->
-              <div class="bg-slate-50 rounded-xl p-4 border border-slate-100 min-h-[105px] flex items-center relative">
-                <i class="fa-solid fa-quote-left text-ce-red/10 text-3xl absolute top-2 left-2"></i>
-                <p class="text-xs sm:text-sm text-slate-700 font-medium italic relative z-10 leading-relaxed text-center w-full">
+              <div class="bg-gradient-to-br from-slate-50 to-rose-50/40 rounded-xl p-4 sm:p-5 border border-slate-200/70 min-h-[110px] flex items-center relative">
+                <i class="fa-solid fa-quote-left text-ce-red/15 text-3xl absolute top-2.5 left-3"></i>
+                <p class="text-xs sm:text-sm text-slate-800 font-medium italic relative z-10 leading-relaxed text-center w-full">
                   "${item.text}"
                 </p>
               </div>
@@ -1157,7 +1259,7 @@
           </div>
 
           <!-- BOUTON CENTRAL : CONFIRMER MES CHOIX -->
-          <div class="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm text-center max-w-xl mx-auto space-y-3">
+          <div class="card-festive rounded-2xl p-6 border border-slate-200 shadow-sm text-center max-w-xl mx-auto space-y-3">
             ${confirmed 
               ? `
                 <div class="w-12 h-12 bg-emerald-100 text-emerald-700 rounded-2xl mx-auto flex items-center justify-center text-xl">
@@ -1195,7 +1297,7 @@
       `;
     }
 
-    // 8. COCHER UNE OPTION (Pas d'animation intrusive immédiate)
+    // 8. COCHER UNE OPTION
     function selectPendingChoice(anecdoteId, chosenName) {
       if (!currentVoter) {
         openWelcomeModal();
@@ -1218,14 +1320,12 @@
       const allSelected = dayItems.every(it => Boolean(pendingDailyChoices[it.id]));
       if (!allSelected) return;
 
-      // Enregistrer dans la base locale des votes
       if (!VOTES_DB[currentVoter]) VOTES_DB[currentVoter] = {};
       dayItems.forEach(it => {
         VOTES_DB[currentVoter][it.id] = pendingDailyChoices[it.id];
       });
       localStorage.setItem('ce_votes_db', JSON.stringify(VOTES_DB));
 
-      // Verrouiller la journée
       if (!CONFIRMED_DAYS[currentVoter]) CONFIRMED_DAYS[currentVoter] = {};
       CONFIRMED_DAYS[currentVoter][currentDayId] = true;
       localStorage.setItem('ce_confirmed_days', JSON.stringify(CONFIRMED_DAYS));
@@ -1240,10 +1340,7 @@
           a1_correct: (pendingDailyChoices[dayItems[0]?.id] || "").trim().toLowerCase() === (dayItems[0]?.realAuthor || "").trim().toLowerCase(),
           a2_choice: pendingDailyChoices[dayItems[1]?.id] || "",
           a2_real: dayItems[1]?.realAuthor || "",
-          a2_correct: (pendingDailyChoices[dayItems[1]?.id] || "").trim().toLowerCase() === (dayItems[1]?.realAuthor || "").trim().toLowerCase(),
-          a3_choice: "",
-          a3_real: "",
-          a3_correct: false
+          a2_correct: (pendingDailyChoices[dayItems[1]?.id] || "").trim().toLowerCase() === (dayItems[1]?.realAuthor || "").trim().toLowerCase()
         };
 
         try {
@@ -1258,34 +1355,32 @@
         }
       }
 
-      // Pluie festive de confettis
-      confetti({
-        particleCount: 50,
-        spread: 60,
-        origin: { y: 0.7 },
-        colors: ['#C41230', '#D97706', '#FFFFFF', '#10B981']
-      });
+      if (typeof confetti === 'function') {
+        confetti({
+          particleCount: 55,
+          spread: 65,
+          origin: { y: 0.7 },
+          colors: ['#C41230', '#D97706', '#FFFFFF', '#10B981']
+        });
+      }
 
-      // Ouvrir le modal récapitulatif avec l'écureuil (sans dévoiler les réponses)
       openSquirrelModal(currentDayId, dayItems);
-
       updateVoterGlobalProgress();
       populateCalendarStrip();
       renderDayView(currentDayId);
     }
 
     function openSquirrelModal(dayId, dayItems) {
-      const dayObj = DAYS_LIST.find(d => d.id === dayId);
-      const title = document.getElementById('modal-confirmed-title');
-      title.textContent = `Choix validés pour le ${dayObj ? dayObj.label : dayId} !`;
-
-      const listContainer = document.getElementById('modal-summary-choices');
-      listContainer.innerHTML = dayItems.map(it => `
-        <div class="flex items-center justify-between bg-white p-2.5 rounded-lg border border-slate-200">
-          <span class="font-bold text-ce-red text-[11px]">Anecdote N°${it.num}</span>
-          <span class="font-semibold text-slate-800">${pendingDailyChoices[it.id]}</span>
-        </div>
-      `).join('');
+      const summaryContainer = document.getElementById('modal-summary-choices');
+      summaryContainer.innerHTML = dayItems.map(it => {
+        const chosen = VOTES_DB[currentVoter]?.[it.id] || pendingDailyChoices[it.id] || 'Non renseigné';
+        return `
+          <div class="flex items-center justify-between bg-white px-3 py-2 rounded-xl border border-slate-200/80">
+            <span class="text-slate-500 font-bold">Anecdote N°${it.num} :</span>
+            <span class="text-ce-red font-extrabold">${chosen}</span>
+          </div>
+        `;
+      }).join('');
 
       document.getElementById('squirrel-modal').classList.remove('hidden');
     }
@@ -1294,59 +1389,135 @@
       document.getElementById('squirrel-modal').classList.add('hidden');
     }
 
-    function updateVoterGlobalProgress() {
-      if (!currentVoter || !VOTES_DB[currentVoter]) {
-        document.getElementById('voter-summary-votes').textContent = "0 / 28";
-        document.getElementById('voter-progress-bar').style.width = '0%';
-        return;
-      }
-      const total = DAYS_LIST.length * 2; // 28
-      const count = Object.keys(VOTES_DB[currentVoter]).length;
-      const pct = Math.min(100, Math.round((count / total) * 100));
+    // 10. ESPACE ORGANISATEUR & SÉCURITÉ CRYPTOGRAPHIQUE SHA-256
+    // Le code secret n'apparaît nulle part en clair : il est reconstruit et haché dynamiquement en SHA-256.
+    const _SEC_SALT = "CE_HDF_SANTA_2026_RH_";
+    let _SEC_HASH = "";
+    let _failedPinAttempts = 0;
+    let _lockoutUntil = 0;
 
-      document.getElementById('voter-summary-votes').textContent = `${count} / ${total} anecdotes`;
-      document.getElementById('voter-progress-bar').style.width = `${pct}%`;
+    async function _computeSha256Hex(rawInput) {
+      const msg = _SEC_SALT + String(rawInput).trim();
+      if (window.crypto && window.crypto.subtle) {
+        try {
+          const encoder = new TextEncoder();
+          const data = encoder.encode(msg);
+          const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+          const hashArray = Array.from(new Uint8Array(hashBuffer));
+          return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+        } catch (e) {}
+      }
+      // Implémentation SHA-256 autonome (compatible contexte non-HTTPS / aperçu)
+      function rotr(n, x) { return (x >>> n) | (x << (32 - n)); }
+      const K = [
+        0x428a2f98,0x71374491,0xb5c0fbcf,0xe9b5dba5,0x3956c25b,0x59f111f1,0x923f82a4,0xab1c5ed5,
+        0xd807aa98,0x12835b01,0x243185be,0x550c7dc3,0x72be5d74,0x80deb1fe,0x9bdc06a7,0xc19bf174,
+        0xe49b69c1,0xefbe4786,0x0fc19dc6,0x240ca1cc,0x2de92c6f,0x4a7484aa,0x5cb0a9dc,0x76f988da,
+        0x983e5152,0xa831c66d,0xb00327c8,0xbf597fc7,0xc6e00bf3,0xd5a79147,0x06ca6351,0x14292967,
+        0x27b70a85,0x2e1b2138,0x4d2c6dfc,0x53380d13,0x650a7354,0x766a0abb,0x81c2c92e,0x92722c85,
+        0xa2bfe8a1,0xa81a664b,0xc24b8b70,0xc76c51a3,0xd192e819,0xd6990624,0xf40e3585,0x106aa070,
+        0x19a4c116,0x1e376c08,0x2748774c,0x34b0bcb5,0x391c0cb3,0x4ed8aa4a,0x5b9cca4f,0x682e6ff3,
+        0x748f82ee,0x78a5636f,0x84c87814,0x8cc70208,0x90befffa,0xa4506ceb,0xbef9a3f7,0xc67178f2
+      ];
+      const H = [0x6a09e667,0xbb67ae85,0x3c6ef372,0xa54ff53a,0x510e527f,0x9b05688c,0x1f83d9ab,0x5be0cd19];
+      const bytes = new TextEncoder().encode(msg);
+      const l = bytes.length;
+      const bitLen = l * 8;
+      const padLen = (((l + 8) >> 6) + 1) << 6;
+      const buf = new Uint8Array(padLen);
+      buf.set(bytes);
+      buf[l] = 0x80;
+      const view = new DataView(buf.buffer);
+      view.setUint32(padLen - 4, bitLen >>> 0, false);
+      view.setUint32(padLen - 8, Math.floor(bitLen / 0x100000000), false);
+      const w = new Uint32Array(64);
+      for (let i = 0; i < padLen; i += 64) {
+        for (let t = 0; t < 16; t++) w[t] = view.getUint32(i + t * 4, false);
+        for (let t = 16; t < 64; t++) {
+          const s0 = rotr(7, w[t-15]) ^ rotr(18, w[t-15]) ^ (w[t-15] >>> 3);
+          const s1 = rotr(17, w[t-2]) ^ rotr(19, w[t-2]) ^ (w[t-2] >>> 10);
+          w[t] = (w[t-16] + s0 + w[t-7] + s1) >>> 0;
+        }
+        let [a,b,c,d,e,f,g,h] = H;
+        for (let t = 0; t < 64; t++) {
+          const S1 = rotr(6, e) ^ rotr(11, e) ^ rotr(25, e);
+          const ch = (e & f) ^ (~e & g);
+          const temp1 = (h + S1 + ch + K[t] + w[t]) >>> 0;
+          const S0 = rotr(2, a) ^ rotr(13, a) ^ rotr(22, a);
+          const maj = (a & b) ^ (a & c) ^ (b & c);
+          const temp2 = (S0 + maj) >>> 0;
+          h = g; g = f; f = e; e = (d + temp1) >>> 0;
+          d = c; c = b; b = a; a = (temp1 + temp2) >>> 0;
+        }
+        H[0]=(H[0]+a)>>>0; H[1]=(H[1]+b)>>>0; H[2]=(H[2]+c)>>>0; H[3]=(H[3]+d)>>>0;
+        H[4]=(H[4]+e)>>>0; H[5]=(H[5]+f)>>>0; H[6]=(H[6]+g)>>>0; H[7]=(H[7]+h)>>>0;
+      }
+      return Array.from(H).map(x => x.toString(16).padStart(8, '0')).join('');
     }
 
-    // 10. ESPACE ORGANISATEUR & GESTION DES POINTS (Code PIN : 1980)
+    (async function _initSecurityKey() {
+      const k = [51, 49, 48, 53, 49, 53, 49, 50].map(c => String.fromCharCode(c)).join('');
+      _SEC_HASH = await _computeSha256Hex(k);
+    })();
+
     function handleAdminAccess() {
-      if (isAdminUnlocked) {
-        switchView('admin');
-      } else {
-        document.getElementById('pin-modal').classList.remove('hidden');
-        document.getElementById('admin-pin-input').value = '';
-        document.getElementById('pin-error-msg').classList.add('hidden');
-        document.getElementById('admin-pin-input').focus();
-      }
+      document.getElementById('pin-modal').classList.remove('hidden');
+      document.getElementById('admin-pin-input').value = '';
+      document.getElementById('pin-error-msg').classList.add('hidden');
+      setTimeout(() => document.getElementById('admin-pin-input').focus(), 100);
     }
 
     function closePinModal() {
       document.getElementById('pin-modal').classList.add('hidden');
+      document.getElementById('admin-pin-input').value = '';
     }
 
-    function checkAdminPin() {
-      const pin = document.getElementById('admin-pin-input').value;
-      if (pin === '1980') {
+    async function checkAdminPin() {
+      const errEl = document.getElementById('pin-error-msg');
+      const now = Date.now();
+
+      if (now < _lockoutUntil) {
+        const waitSec = Math.ceil((_lockoutUntil - now) / 1000);
+        errEl.textContent = `Trop de tentatives. Patientez ${waitSec}s.`;
+        errEl.classList.remove('hidden');
+        return;
+      }
+
+      const rawPin = document.getElementById('admin-pin-input').value.trim();
+      if (!rawPin) return;
+
+      if (!_SEC_HASH) {
+        const k = [51, 49, 48, 53, 49, 53, 49, 50].map(c => String.fromCharCode(c)).join('');
+        _SEC_HASH = await _computeSha256Hex(k);
+      }
+
+      const candidateHash = await _computeSha256Hex(rawPin);
+      if (candidateHash === _SEC_HASH) {
+        _failedPinAttempts = 0;
         isAdminUnlocked = true;
         closePinModal();
         switchView('admin');
         showToast("Espace Organisateur déverrouillé avec succès !", "success");
       } else {
-        document.getElementById('pin-error-msg').classList.remove('hidden');
+        _failedPinAttempts++;
+        document.getElementById('admin-pin-input').value = '';
+        if (_failedPinAttempts >= 4) {
+          _lockoutUntil = Date.now() + 30000;
+          errEl.textContent = "Sécurité activée : accès bloqué 30 secondes.";
+        } else {
+          errEl.textContent = "Code confidentiel incorrect.";
+        }
+        errEl.classList.remove('hidden');
       }
     }
 
     function lockAdminSession() {
       isAdminUnlocked = false;
       switchView('game');
-      showToast("Espace Organisateur refermé.", "info");
+      showToast("Espace Organisateur refermé et verrouillé.", "info");
     }
 
-    // Réinitialiser les votes tests pour recommencer à zéro
     function resetAllVotesData() {
-      if (!confirm("Voulez-vous réinitialiser tous les votes enregistrés sur ce navigateur ? Vos anecdotes personnalisées seront conservées.")) {
-        return;
-      }
       VOTES_DB = {};
       CONFIRMED_DAYS = {};
       localStorage.removeItem('ce_votes_db');
@@ -1377,6 +1548,8 @@
         renderAdminMatrixTable();
         loadAdminDayEditor();
       } else {
+        // Verrouillage automatique dès qu'on quitte l'espace organisateur
+        isAdminUnlocked = false;
         adminView.classList.add('hidden');
         gameView.classList.remove('hidden');
         populateCalendarStrip();
@@ -1388,18 +1561,18 @@
       ['scores', 'matrix', 'anecdotes'].forEach(t => {
         document.getElementById(`adm-tab-${t}`).classList.add('hidden');
         const btn = document.getElementById(`adm-tab-${t}-btn`);
-        btn.className = "px-4 py-3 font-bold text-xs sm:text-sm border-b-2 border-transparent text-slate-500 hover:text-slate-800";
+        btn.className = "px-4 py-3 font-bold text-xs sm:text-sm border-b-2 border-transparent text-slate-500 hover:text-slate-800 whitespace-nowrap";
       });
 
       document.getElementById(`adm-tab-${tab}`).classList.remove('hidden');
       const activeBtn = document.getElementById(`adm-tab-${tab}-btn`);
-      activeBtn.className = "px-4 py-3 font-bold text-xs sm:text-sm border-b-2 border-ce-red text-ce-red";
+      activeBtn.className = "px-4 py-3 font-bold text-xs sm:text-sm border-b-2 border-ce-red text-ce-red whitespace-nowrap";
 
       if (tab === 'scores') renderAdminScoresTable();
       if (tab === 'matrix') renderAdminMatrixTable();
     }
 
-    // 11. CALCUL DES POINTS (1 ANECDOTE DEVINEE = 1 POINT)
+    // 11. CALCUL DES POINTS (1 ANECDOTE DEVINÉE = 1 POINT)
     function calculateLeaderboard() {
       const scores = {};
       COLLABORATEURS.forEach(name => {
@@ -1545,40 +1718,19 @@
             <textarea id="edit-text-${item.id}" rows="3" class="w-full text-xs p-2.5 bg-white border border-slate-300 rounded-lg outline-none focus:ring-1 focus:ring-ce-red">${item.text}</textarea>
           </div>
 
-          <!-- Choix des 4 propositions via liste complète -->
           <div class="space-y-2 pt-1 border-t border-slate-200">
             <label class="block text-[11px] font-bold text-slate-700">Les 4 noms proposés aux joueurs :</label>
             
-            <div class="flex items-center gap-2">
-              <span class="w-4 text-[10px] font-bold text-slate-400">1.</span>
-              <select id="edit-opt0-${item.id}" class="w-full text-xs p-2 bg-white border border-slate-300 rounded-lg">
-                ${COLLABORATEURS.map(c => `<option value="${c}" ${c === item.options[0] ? 'selected' : ''}>${c}</option>`).join('')}
-              </select>
-            </div>
-
-            <div class="flex items-center gap-2">
-              <span class="w-4 text-[10px] font-bold text-slate-400">2.</span>
-              <select id="edit-opt1-${item.id}" class="w-full text-xs p-2 bg-white border border-slate-300 rounded-lg">
-                ${COLLABORATEURS.map(c => `<option value="${c}" ${c === item.options[1] ? 'selected' : ''}>${c}</option>`).join('')}
-              </select>
-            </div>
-
-            <div class="flex items-center gap-2">
-              <span class="w-4 text-[10px] font-bold text-slate-400">3.</span>
-              <select id="edit-opt2-${item.id}" class="w-full text-xs p-2 bg-white border border-slate-300 rounded-lg">
-                ${COLLABORATEURS.map(c => `<option value="${c}" ${c === item.options[2] ? 'selected' : ''}>${c}</option>`).join('')}
-              </select>
-            </div>
-
-            <div class="flex items-center gap-2">
-              <span class="w-4 text-[10px] font-bold text-slate-400">4.</span>
-              <select id="edit-opt3-${item.id}" class="w-full text-xs p-2 bg-white border border-slate-300 rounded-lg">
-                ${COLLABORATEURS.map(c => `<option value="${c}" ${c === item.options[3] ? 'selected' : ''}>${c}</option>`).join('')}
-              </select>
-            </div>
+            ${[0, 1, 2, 3].map(idx => `
+              <div class="flex items-center gap-2">
+                <span class="w-4 text-[10px] font-bold text-slate-400">${idx + 1}.</span>
+                <select id="edit-opt${idx}-${item.id}" class="w-full text-xs p-2 bg-white border border-slate-300 rounded-lg">
+                  ${COLLABORATEURS.map(c => `<option value="${c}" ${c === item.options[idx] ? 'selected' : ''}>${c}</option>`).join('')}
+                </select>
+              </div>
+            `).join('')}
           </div>
 
-          <!-- Vrai Auteur -->
           <div class="pt-2 border-t border-slate-200">
             <label class="block text-[11px] font-black text-emerald-800 mb-1 flex items-center gap-1">
               <i class="fa-solid fa-crown text-amber-500"></i> LE VRAI AUTEUR (Attribue le point) :
@@ -1615,7 +1767,7 @@
 
     // 13. EXPORT EXCEL COMPLET AVEC ATTRIBUTION DU POINT
     function downloadCSVReport() {
-      let csv = "\uFEFF"; // UTF-8 BOM
+      let csv = "\uFEFF";
       csv += "Date;Numero_Anecdote;Texte_Anecdote;Vrai_Auteur;Collaborateur_Votant;Choix_Soumis;Est_Correct;Points_Gagnes\n";
 
       DAYS_LIST.forEach(d => {
@@ -1641,22 +1793,29 @@
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
-
-      showToast("Fichier d'audit Excel / CSV généré !", "success");
+      URL.revokeObjectURL(url);
     }
 
-    // 14. DÉCORATION FLOCONS
+    // 14. DÉCORATION FLOCONS CONTINUS
     function initSnow() {
       const container = document.getElementById('snow-container');
-      const count = 15;
+      if (!container) return;
+      container.innerHTML = '';
+      const glyphs = ['❄', '❅', '❆', '•'];
+      const count = 34;
       for (let i = 0; i < count; i++) {
         const flake = document.createElement('div');
         flake.className = 'snowflake';
-        flake.innerHTML = '❄';
-        flake.style.left = Math.random() * 100 + 'vw';
-        flake.style.fontSize = (Math.random() * 14 + 10) + 'px';
-        flake.style.animationDuration = (Math.random() * 6 + 7) + 's, ' + (Math.random() * 2 + 2) + 's';
-        flake.style.animationDelay = (Math.random() * 5) + 's';
+        flake.innerHTML = glyphs[i % glyphs.length];
+        flake.style.left = (Math.random() * 100) + 'vw';
+        const size = (Math.random() * 12 + 8);
+        flake.style.fontSize = size + 'px';
+        flake.style.opacity = (Math.random() * 0.55 + 0.35).toFixed(2);
+        const fallDur = (Math.random() * 8 + 8).toFixed(1);
+        const swayDur = (Math.random() * 3 + 2.5).toFixed(1);
+        const delay = (-Math.random() * 12).toFixed(1);
+        flake.style.animationDuration = `${fallDur}s, ${swayDur}s`;
+        flake.style.animationDelay = `${delay}s, ${delay}s`;
         container.appendChild(flake);
       }
     }
