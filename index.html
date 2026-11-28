@@ -754,7 +754,7 @@
       "Olivier SOLAZZO",
       "Karen ROLLER",
       "Nadège ALLIOT",
-      "Elise BOUCHEQUET",
+      "Elise BOCHEQUET",
       "Anthony BOUDRY",
       "Cyril CANONNE",
       "Daphné DERETZ",
@@ -771,11 +771,11 @@
       "Stéphanie VASSEUR",
       "Valérie WATERLOT",
       "Fabien GERARD",
-      "Lydia MONNEY-BOSSO",
+      "Lydia BOSSO",
       "Raphael DUSSART",
       "Sokphally PRAK",
       "Stéphanie LEGRAND",
-      "Frédérique ARCY",
+      "Frédérque ARCY",
       "Nicolas DIERICKX",
       "Joséphine DUMOULIN",
       "François DUVERGER",
@@ -796,70 +796,94 @@
       "Gaelle TONEL",
       "Delphine WALLRICH",
       "Yalcin AVCIOGLU",
-      "Manon SALHI"
+      "Manon Salhi"
     ].sort((a, b) => a.localeCompare(b, 'fr'));
 
-    // 2. GÉNÉRATION DES 14 JOURS (1ER DÉCEMBRE AU 14 DÉCEMBRE)
-    const DAYS_LIST = [];
-    const startDate = new Date(2026, 11, 1);  // 1er Décembre 2026
-    const endDate = new Date(2026, 11, 14);   // 14 Décembre 2026
+    // 2. DATES DU CALENDRIER (1ER AU 14 DÉCEMBRE = 14 JOURS)
+    const DAYS_LIST = [
+      { id: "2026-12-01", label: "1er Décembre", dayNumber: 1 },
+      { id: "2026-12-02", label: "2 Décembre", dayNumber: 2 },
+      { id: "2026-12-03", label: "3 Décembre", dayNumber: 3 },
+      { id: "2026-12-04", label: "4 Décembre", dayNumber: 4 },
+      { id: "2026-12-05", label: "5 Décembre", dayNumber: 5 },
+      { id: "2026-12-06", label: "6 Décembre", dayNumber: 6 },
+      { id: "2026-12-07", label: "7 Décembre", dayNumber: 7 },
+      { id: "2026-12-08", label: "8 Décembre", dayNumber: 8 },
+      { id: "2026-12-09", label: "9 Décembre", dayNumber: 9 },
+      { id: "2026-12-10", label: "10 Décembre", dayNumber: 10 },
+      { id: "2026-12-11", label: "11 Décembre", dayNumber: 11 },
+      { id: "2026-12-12", label: "12 Décembre", dayNumber: 12 },
+      { id: "2026-12-13", label: "13 Décembre", dayNumber: 13 },
+      { id: "2026-12-14", label: "14 Décembre", dayNumber: 14 }
+    ];
 
-    let curD = new Date(startDate);
-    while (curD <= endDate) {
-      const dayNum = curD.getDate();
-      const monthStr = curD.toLocaleString('fr-FR', { month: 'long' });
-      const iso = `${curD.getFullYear()}-${String(curD.getMonth() + 1).padStart(2, '0')}-${String(dayNum).padStart(2, '0')}`;
-      DAYS_LIST.push({
-        id: iso,
-        dateObj: new Date(curD),
-        dayNumber: dayNum,
-        label: `${dayNum} ${monthStr.charAt(0).toUpperCase() + monthStr.slice(1)}`
-      });
-      curD.setDate(curD.getDate() + 1);
-    }
-
-    // 3. ANECDOTES PAR DÉFAUT
-    const sampleStories = [
-      "A déjà confondu le micro d'une visio nationale avec son karaoké en fredonnant du Céline Dion.",
-      "A fait croire à toute l'équipe pendant trois mois qu'il/elle était champion(ne) régional(e) de Scrabble.",
-      "A accidentellement versé son café chaud dans son pot à crayons au lieu de sa tasse un lundi matin.",
-      "A participé à une course à pied officielle déguisé(e) en sapin de Noël avec guirlandes clignotantes.",
-      "A envoyé par erreur sa liste de courses personnelle au directeur de groupe.",
-      "Possède secrètement une collection de plus de 80 paires de chaussettes dépareillées et décalées.",
-      "Est venu(e) travailler toute une journée avec deux chaussures totalement différentes aux pieds sans s'en rendre compte.",
-      "A un jour commandé 40 plateaux repas au lieu de 4 suite à une faute de frappe mémorable.",
-      "A été figurant(e) dans un clip de musique des années 2000 qui passe encore à la télé.",
-      "Ne sait absolument pas siffler malgré des années d'entraînement intensif au volant de sa voiture."
+    // 3. ANECDOTES OFFICIELLES SÉLECTIONNÉES (28 ANECDOTES EXACTES DE VOTRE CAPTURE D'ÉCRAN)
+    const OFFICIAL_ANECDOTES = [
+      { author: "Adeline LEFEVRE", text: "Je me suis mise au piano à 40 ans !" },
+      { author: "Yalcin AVCIOGLU", text: "Les gens me prennent pour un vrai DRH, alors que je suis un agent secret :p" },
+      { author: "Bruno LECOINTE", text: "J'ai participé à un sauvetage en hélicoptère" },
+      { author: "Delphine WALLRICH", text: "J'ai refoulé Christophe Maé à l'entrée d'une boite de nuit !" },
+      { author: "Lydia BOSSO", text: "Une fois je me suis retrouvé bloqué pendant 9 heures à l'aéroport d'Istanbul (car on m'avait refusé l'embarquement et confisqué mon passeport)" },
+      { author: "Thibaut FARINE", text: "J'ai terminé la descente d'un toboggan dans les bras d'un inconnu" },
+      { author: "Benjamin RIVIERE", text: "J'ai déjà fait un tonneau en voiture." },
+      { author: "Benjamin DEVIN", text: "Je suis devin" },
+      { author: "Nicolas DIERICKX", text: "Plus jeune j'ai simulé l'appendicite pour ne pas aller en cours et finalement j'ai été opéré 😅" },
+      { author: "Daphné DERETZ", text: "j'ai passé toutes mes années de lycée dans la même classe que Raphaël Varane" },
+      { author: "Elodie DEMAILLY", text: "J'ai déjà animé un évènement au Zénith devant 3000 personnes !" },
+      { author: "Cyril CANONNE", text: "Pendant les vacances, je me suis perdu sur la plage et mes parents m’ont cherché pendant 24 heures." },
+      { author: "Ines GAY", text: "J'ai déjà nagé avec un requin" },
+      { author: "Vanessa VALLET", text: "Je ne suis pas Claude François, mais j'ai été électrisé avec un sèche-cheveux." },
+      { author: "Véronique RATTE", text: "j'ai fait de la comédie musicale pendant 5 ans" },
+      { author: "Raphael DUSSART", text: "J'ai passé une matinée sans me lever de mon bureau après avoir déchiré mon pantalon" },
+      { author: "Karine PLUQUET", text: "j'ai fait de l'hélicoptère avec Christian MORIN (présentateur de la roue de la fortune)" },
+      { author: "Thibault SAISON", text: "Petit, j'ai été demandé par Sochaux et ai fait des essais à Lens" },
+      { author: "Virginie LENNE", text: "J'ai suivi 11 années de formation musicale au conservatoire" },
+      { author: "Jean-Baptiste MAHIEUX", text: "J'ai rencontré un ancien président de la république" },
+      { author: "Stéphanie VASSEUR", text: "Mon papa aurait pu être arrêté par la police de Carson City à cause de moi" },
+      { author: "Karen ROLLER", text: "J'ai failli mourir à cause d'une chenille 😱" },
+      { author: "Anthony STOPIN", text: "Un policier de la BAC a braqué son arme sur moi, je n'avais que 13 ans." },
+      { author: "Manon Salhi", text: "J'ai déjà dormi en tente dans le désert du Sahara" },
+      { author: "Pierre GRZESIAK", text: "j'ai déjà participé à un \"concours du plus gros mangeur de Burgers\" pour gagner un voyage en Espagne (j'ai perdu)" },
+      { author: "Jérémy BAUDUIN", text: "J'ai tapé dans la main de Michael Jordan" },
+      { author: "Olivier SOLAZZO", text: "J'ai vécu 18 mois dans le désert au milieu des chameaux" },
+      { author: "Claudia MAREIX", text: "J'ai déjà fait un saut en parachute à 4000m" }
     ];
 
     function createInitialDB() {
       const db = {};
-      let cIdx = 0;
-      let sIdx = 0;
+      let idx = 0;
 
       DAYS_LIST.forEach((d) => {
         db[d.id] = [1, 2].map(n => {
-          const author = COLLABORATEURS[cIdx % COLLABORATEURS.length];
-          cIdx++;
+          const itemData = OFFICIAL_ANECDOTES[idx % OFFICIAL_ANECDOTES.length];
+          const author = itemData.author;
           const others = COLLABORATEURS.filter(x => x !== author);
-          const d1 = others[(cIdx * 3) % others.length];
-          const d2 = others[(cIdx * 5 + 1) % others.length];
-          const d3 = others[(cIdx * 7 + 2) % others.length];
-          const choices = [author, d1, d2, d3].sort(() => Math.random() - 0.5);
+          
+          // Sélection déterministe de 3 autres collaborateurs distincts + le vrai propriétaire
+          const d1 = others[(idx * 7 + 3) % others.length];
+          const d2 = others[(idx * 13 + 11) % others.length];
+          const d3 = others[(idx * 19 + 17) % others.length];
+          const choices = [author, d1, d2, d3].sort((a, b) => a.localeCompare(b, 'fr'));
 
-          const story = sampleStories[sIdx % sampleStories.length];
-          sIdx++;
+          idx++;
 
           return {
             id: `${d.id}_a${n}`,
             num: n,
-            text: story,
+            text: itemData.text,
             realAuthor: author,
             options: choices
           };
         });
       });
       return db;
+    }
+
+    // Version des données pour forcer la mise à jour des nouvelles anecdotes si l'ancien cache existait
+    const DB_SCHEMA_VERSION = "v4_screenshot_exact_28_anecdotes";
+    if (localStorage.getItem('ce_db_version') !== DB_SCHEMA_VERSION) {
+      localStorage.removeItem('ce_anecdotes_db');
+      localStorage.setItem('ce_db_version', DB_SCHEMA_VERSION);
     }
 
     // Base locale de données
